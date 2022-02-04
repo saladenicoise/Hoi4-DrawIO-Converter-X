@@ -5,16 +5,9 @@ import re
 import os
 from html import unescape
 import tkinter as tk
-import math
-import json
-from urllib.request import URLError
-from urllib.request import HTTPError
-from urllib.request import urlopen
-from urllib.request import Request, urlopen
-from bs4 import BeautifulSoup
-from urllib.parse import quote
+from math import inf as INF
 from tkinter.scrolledtext import ScrolledText
-import deepl
+from deepl import Translator
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -35,7 +28,7 @@ shared_focus = {
 <prereqs><exclusives>}
 '''
 
-translator = deepl.Translator(os.getenv('DEEPL_KEY'))
+translator = Translator(os.getenv('DEEPL_KEY'))
 
 # Regex to find focuses in the draw.io file (boxes), these have a stroke
 BOX_REGEX = re.compile(
@@ -200,8 +193,8 @@ class App(tk.Frame):
                     t_focus.prerequisites.append(source)
 
         # Find the uppermost and leftmost focus, to set the origin point
-        base_x = math.inf
-        base_y = math.inf
+        base_x = INF
+        base_y = INF
         for focus_id in foci:
             focus = foci[focus_id]
             if focus.raw_x < base_x:
