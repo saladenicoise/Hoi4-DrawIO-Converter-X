@@ -97,6 +97,11 @@ class App(tk.Frame):
         self.run_script['command'] = self.run_app
         self.run_script.pack(side='top', pady=5)
 
+        self.output_text = tk.StringVar(value='Ready for running')
+        self.output_label = tk.Label(self, textvariable=self.output_text)
+        self.output_label['wraplength'] = 480
+        self.output_label.pack(side='top', pady=5)
+
         self.country_tag_label = tk.Label(self)
         self.country_tag_label['text'] = 'Country Tag\n(USA, MEX, BRA)'
         self.country_tag_label['wraplength'] = 170
@@ -270,6 +275,9 @@ class App(tk.Frame):
 
         with open(f'output/{country_tag}_loc.yml', 'w', encoding='utf-8-sig') as o_file:
             o_file.write(out_loc)
+
+        self.output_text.set(
+            f"Country {country_tag} processing was succeed! check output folder.")
 
 
 root = tk.Tk()
