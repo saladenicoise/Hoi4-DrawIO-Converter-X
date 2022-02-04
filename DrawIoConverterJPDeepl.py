@@ -26,6 +26,9 @@ shared_focus = {
 	cost = 2
 	x = <x>
 	y = <y>
+	ai_will_do = {
+		factor = 1
+	}
 	completion_reward = {
 		log = "[GetDateText]: [Root.GetName]: Focus <tag>"
 	}
@@ -129,6 +132,8 @@ class App(tk.Frame):
 
     def run_app(self):
         country_tag = self.country_tag.get()
+        if country_tag is None:
+            country_tag = "DEF"
 
         foci = {}
         i_contents = self.drawio_data.get(1.0, tk.END).strip()
@@ -151,12 +156,6 @@ class App(tk.Frame):
             focus_x = X_REGEX.findall(e[0])[0]
             focus_y = Y_REGEX.findall(e[0])[0]
 
-            baseurl = "https://openapi.naver.com/v1/papago/n2mt"
-            # 띄어쓰기 : split처리후 [1:]을 for문으로 붙인다.
-            #trsText = text
-            # if len(trsText) == 1:
-            #	print("ERROR")
-            # else:
             trsText = text
             translatedText = translator.translate_text(
                 trsText, target_lang="EN-US")
