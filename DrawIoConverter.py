@@ -1,4 +1,4 @@
-# by Flaxbeard fixed by nika
+# by Flaxbeard fixed by nika and Ysiki
 # version 0.2.0, 7/8/21
 
 import re
