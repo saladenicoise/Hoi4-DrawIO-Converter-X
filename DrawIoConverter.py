@@ -62,8 +62,9 @@ SPACE_REGEX = re.compile(r'\s+')
 NON_ALPHANUMERIC_REGEX = re.compile(r'[^a-zA-Z0-9_]+')
 
 
-# Represents a single focus
 class Focus:
+    """Represents a single focus"""
+
     def __init__(self, focus_id, focus_tag, focus_name=None):
         self.id = focus_id
         self.tag = focus_tag
@@ -89,8 +90,8 @@ class App(tk.Frame):
         self.pack()
         self.create_widgets()
 
-    # Set up GUI
     def create_widgets(self):
+        """Set up GUI"""
         self.run_script = tk.Button(self)
         self.run_script['text'] = 'Run Program'
         self.run_script['command'] = self.run_app
@@ -263,10 +264,11 @@ class App(tk.Frame):
             focus = foci[focus_id]
             out_loc += f' {focus.tag}:0 "{focus.name}"\n'
 
-        with open('drawio_focus_tree.txt', 'w') as o_file:
+        os.makedirs("output", exist_ok=True)
+        with open(f'output/{country_tag}_focus.txt', 'w') as o_file:
             o_file.write(out)
 
-        with open('drawio_loc.yml', 'w', encoding='utf-8-sig') as o_file:
+        with open(f'output/{country_tag}_loc.yml', 'w', encoding='utf-8-sig') as o_file:
             o_file.write(out_loc)
 
 
