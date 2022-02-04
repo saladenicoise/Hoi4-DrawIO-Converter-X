@@ -132,7 +132,7 @@ class App(tk.Frame):
 
     def run_app(self):
         country_tag = self.country_tag.get()
-        if country_tag is None:
+        if country_tag is None or country_tag == "":
             country_tag = "DEF"
 
         foci = {}
