@@ -14,7 +14,7 @@ Download exe file from github [releases](https://github.com/yuto-moriizumi/Hoi4-
 1. Lanch exe file and paste the xml you copied into the textarea
 1. Click "Run Program" then you will get focus file and localisation file in output box which will be created.
 
-## Build
+## Build(For Developers)
 
 Use pyinstaller to build exe file
 
