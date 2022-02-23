@@ -1,5 +1,5 @@
 .vscode
-.env
+key.py
 __pycache__
 build
 dist

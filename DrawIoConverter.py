@@ -8,8 +8,7 @@ import tkinter as tk
 from math import inf as INF
 from tkinter.scrolledtext import ScrolledText
 from deepl import Translator
-from dotenv import load_dotenv
-load_dotenv()
+from key import DEEPL_KEY
 
 # Base structure of a focus
 BASE_FOCUS = '''
@@ -28,7 +27,7 @@ shared_focus = {
 <prereqs><exclusives>}
 '''
 
-translator = Translator(os.getenv('DEEPL_KEY'))
+translator = Translator(DEEPL_KEY)
 
 # Regex to find focuses in the draw.io file (boxes), these have a stroke
 BOX_REGEX = re.compile(
