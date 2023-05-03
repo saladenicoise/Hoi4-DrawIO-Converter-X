@@ -1,5 +1,6 @@
 # by Flaxbeard fixed by nika and Ysiki
-# version 0.2.0, 7/8/21
+# Updated by Salad#0101 for use with Avalanche v1.12
+# version 0.3.0, 2023-05-03
 
 import re
 import os
@@ -7,27 +8,24 @@ from html import unescape
 import tkinter as tk
 from math import inf as INF
 from tkinter.scrolledtext import ScrolledText
-from deepl import Translator
-from key import DEEPL_KEY
 
 # Base structure of a focus
 BASE_FOCUS = '''
-shared_focus = {
-	id = <tag>
-	icon = GFX_generic_suspend_constitution
-	cost = 2
-	x = <x>
-	y = <y>
-	ai_will_do = {
-		factor = 1
-	}
-	completion_reward = {
-		log = "[GetDateText]: [Root.GetName]: Focus <tag>"
-	}
-<prereqs><exclusives>}
+    focus = {
+	    id = <tag>
+	    icon = GFX_generic_suspend_constitution
+	    cost = 5
+	    x = <x>
+	    y = <y>
+	    ai_will_do = {
+		    factor = 1
+	    }
+	    completion_reward = {
+		    log = "[GetDateText]: [Root.GetName]: Focus <tag>"
+	    }
+        <prereqs><exclusives>
+    }
 '''
-
-translator = Translator(DEEPL_KEY)
 
 # Regex to find focuses in the draw.io file (boxes), these have a stroke
 BOX_REGEX = re.compile(
@@ -144,8 +142,9 @@ class App(tk.Frame):
             text = VALUE_REGEX.findall(e[0])[0]
             text = unescape(text).replace('&nbsp;', ' ')
             text = re.sub(TAG_REGEX, ' ', text)
-            text = re.sub(SPACE_REGEX, ' ', text)
+            text = re.sub(SPACE_REGEX, '_', text)
             text = text.strip()
+            
 
             # Break if no name (false positive)
             if not text:
@@ -154,14 +153,10 @@ class App(tk.Frame):
             focus_x = X_REGEX.findall(e[0])[0]
             focus_y = Y_REGEX.findall(e[0])[0]
 
-            trsText = text
-            translatedText = translator.translate_text(
-                trsText, target_lang="EN-US")
-            print(translatedText.text)
             focus_name = text
 
             focus_tag = re.sub(NON_ALPHANUMERIC_REGEX, '',
-                               translatedText.text.replace(' ', '_').lower())
+                               text)
             focus_tag = f'{country_tag}_{focus_tag}'
 
             focus = Focus(focus_id, focus_tag, focus_name)
@@ -221,16 +216,32 @@ class App(tk.Frame):
                     (focus.raw_y - foci[focus.relative].raw_y) / self.vert_spacing_amnt)
 
         # Output the foci
-        out = ''
+        out = '''
+focus_tree = {
+    id = ''' + country_tag.lower() + '''
+            
+	country = {
+		factor = 0
+		modifier = {
+		    add = 10
+			tag = ''' + country_tag + '''
+		}
+	}
+            
+	continuous_focus_position = { 
+		x = 0
+		y = 0
+    }
+'''
         for focus_id in foci:
             focus = foci[focus_id]
 
             # Assemble prerequisite code
             prereqs_code = ''
             for prereq in focus.prerequisites:
-                prereqs_code += f'\tprerequisite = {{ focus = {foci[prereq].tag} }}\n'
+                prereqs_code += f'\t\tprerequisite = {{ focus = {foci[prereq].tag} }}\n'
             if len(focus.dashed_prerequisites) > 0:
-                prereqs_code += '\tprerequisite = {\n'
+                prereqs_code += '\t\tprerequisite = {\n'
                 for prereq in focus.dashed_prerequisites:
                     prereqs_code += f'\t\tfocus = {foci[prereq].tag}\n'
                 prereqs_code += '\t}\n'
@@ -238,12 +249,12 @@ class App(tk.Frame):
             # Assemble mutually exclusive code
             exclusives_code = ''
             for exclusive in focus.exclusives:
-                exclusives_code += f'\tmutually_exclusive = {{ focus = {foci[exclusive].tag} }}\n'
+                exclusives_code += f'\t\tmutually_exclusive = {{ focus = {foci[exclusive].tag} }}\n'
             focus_code = BASE_FOCUS.replace('<tag>', focus.tag)
 
             # Assemble positioning code
             if focus.relative:
-                prereqs_code = f'\trelative_position_id = {foci[focus.relative].tag}\n' + prereqs_code
+                prereqs_code = f'relative_position_id = {foci[focus.relative].tag}\n' + prereqs_code
                 focus_code = focus_code.replace('<x>', str(
                     focus.rel_x)).replace('<y>', str(focus.rel_y))
             else:
@@ -260,12 +271,14 @@ class App(tk.Frame):
         for focus_id in foci:
             focus = foci[focus_id]
             out_loc += f' {focus.tag}:0 "{focus.name}"\n'
+            out_loc += f' {focus.tag}_desc:0 "{focus.name}_desc"\n'
 
         os.makedirs("output", exist_ok=True)
-        with open(f'output/{country_tag}_focus.txt', 'w') as o_file:
+        with open(f'output/{country_tag}.txt', 'w') as o_file:
             o_file.write(out)
+            o_file.write("}")
 
-        with open(f'output/{country_tag}_loc.yml', 'w', encoding='utf-8-sig') as o_file:
+        with open(f'output/mod{country_tag}_l_english.yml', 'w', encoding='utf-8-sig') as o_file:
             o_file.write(out_loc)
 
         self.output_text.set(
